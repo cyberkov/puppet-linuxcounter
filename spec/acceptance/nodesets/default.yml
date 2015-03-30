@@ -1,0 +1,13 @@
+---
+HOSTS:
+  debian-wheezy-64-x64:
+    roles:
+      - master
+      - default
+    platform: debian-wheezy-x86_64
+    box : fgrehm/wheezy64-lxc
+#    box_url : http://puppet-vagrant-boxes.puppetlabs.com/centos-64-x64-vbox4210-nocm.box
+    hypervisor : vagrant
+CONFIG:
+  type: foss
+  lxc__bridge_name: 'vlxcbr1'
