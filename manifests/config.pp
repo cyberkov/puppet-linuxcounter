@@ -1,35 +1,49 @@
 class linuxcounter::config (
-$user,
-$group,
-$counter_number,
-$update_key,
-$machine_number
-) {
+$user = $::linuxcounter::params::user,
+$group = $::linuxcounter::params::group,
+$lico_config = $linuxcounter::params::lico_config
+) inherits ::linuxcounter::params {
+  include linuxcounter::params
 
-validate_int($counter_number)
-
-file {"/home/${user}/.linuxcounter/${::hostname}":
-  ensure => present,
-  owner  => $user,
-  group  => $group,
-  mode   => '0600'
+  file {'lico_config':
+    ensure => present,
+    path   => $lico_config,
+    owner  => $user,
+    group  => $group,
+    mode   => '0600'
   }
 
-cron {'linuxcounter':
-  ensure  => present,
-  hour    => fqdn_rand(24),
-  minute  => fqdn_rand(60),
-  weekday => fqdn_rand(7),
-  user    => $user,
-  command => "${linuxcounter::path} -m"
-}
 
-#scriptversion='lico-update.sh version 0.3.20'
-#hostname='${::hostname}'
-#counter_number=''
-#update_key=''
-#machine_number=''
-#distribution='Ubuntu'
-#distribversion='14.10'
+  file_line { 'counter_number':
+    path    => $linuxcounter::lico_config,
+    line    => "counter_number='${linuxcounter::counter_number}'",
+    require => File['lico_config'],
+  }
+  file_line { 'update_key':
+    path    => $linuxcounter::lico_config,
+    line    => "update_key='${linuxcounter::update_key}'",
+    require => File['lico_config'],
+  }
+  file_line { 'machine_number':
+    path    => $linuxcounter::lico_config,
+    line    => "machine_number='${linuxcounter::machine_number}'",
+    require => File['lico_config'],
+  }
+  file_line { 'hostname':
+    path    => $linuxcounter::lico_config,
+    line    => "hostname='${::hostname}'",
+    require => File['lico_config'],
+  }
 
+  if $linuxcounter::manage_cron {
+    cron {'linuxcounter':
+      ensure  => present,
+      hour    => fqdn_rand(24),
+      minute  => fqdn_rand(60),
+      weekday => fqdn_rand(7),
+      user    => $user,
+      command => "${linuxcounter::path}/lico-update.sh -m",
+      require => Class['linuxcounter::install']
+    }
+  }
 }
