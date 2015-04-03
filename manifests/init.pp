@@ -7,8 +7,8 @@ class linuxcounter (
   $user = $linuxcounter::params::user,
   $group = $linuxcounter::params::group,
   $lico_config = $linuxcounter::params::lico_config,
-  $update_key = '',
-  $machine_number = '',
+  $update_key = undef,
+  $machine_number = undef,
   $manage_user = false,
   $manage_cron = true
 ) {
