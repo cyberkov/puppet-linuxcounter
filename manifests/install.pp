@@ -1,24 +1,19 @@
 class linuxcounter::install (
-    $user = $::linuxcounter::params::user,
-    $group = $::linuxcounter::params::group,
-    $path   = $::linuxcounter::path,
-) inherits ::linuxcounter::params {
+    $user = $linuxcounter::params::user,
+    $group = $linuxcounter::params::group,
+    $path   = $linuxcounter::params::path,
+    $download_url = $linuxcounter::params::download_url,
+    $manage_user = false
+) inherits linuxcounter::params {
   include wget
-  include linuxcounter::params
 
-  if $linuxcounter::manage_user {
-    user { $linuxcounter::user:
+  if $manage_user {
+    user { 'lico_user':
       ensure     => present,
-      gid        => $linuxcounter::group,
+      name       => $user,
+      gid        => $group,
       managehome => true,
     }
-  }
-
-  wget::fetch { 'download lico script':
-    source      => $linuxcounter::params::download_url,
-    destination => "${path}/lico-update.sh",
-    verbose     => false,
-    cache_dir   => '/var/cache/wget',
   }
 
   file { 'lico_path':
@@ -27,6 +22,14 @@ class linuxcounter::install (
     mode   => '0755',
     owner  => $user,
     group  => $group
+  }
+
+  wget::fetch { "download ${download_url}":
+    source      => $download_url,
+    destination => "${path}/lico-update.sh",
+    verbose     => false,
+    cache_dir   => '/var/cache/wget',
+    require     => File['lico_path'],
   }
 
   file { 'lico-update.sh':

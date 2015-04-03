@@ -13,6 +13,7 @@ class linuxcounter (
   $manage_cron = true
 ) {
   include linuxcounter::params
+
   # Sanity checks
   if $::kernel != 'Linux' {
     fail('This module installs the Linuxcounter client. What\'s the point if it\'s not Linux?')
@@ -34,6 +35,14 @@ class linuxcounter (
     }
   }
 
-  class { 'linuxcounter::install': } ->
-  class { 'linuxcounter::config': }
+  class { 'linuxcounter::install':
+    user         => $user,
+    group        => $group,
+    path         => $path,
+    download_url => $download_url,
+    manage_user  => $manage_user
+  } ->
+  class { 'linuxcounter::config':
+    manage_cron  => $manage_cron
+  }
 }

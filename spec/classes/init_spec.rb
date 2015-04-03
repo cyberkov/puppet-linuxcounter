@@ -10,12 +10,12 @@ describe 'linuxcounter' do
   context 'with defaults for all parameters' do
     it {
       should contain_class('linuxcounter')
-      should_not contain_user('linuxcounter')
+      should_not contain_user('lico_user')
       should contain_cron('linuxcounter')
     }
 
     it {
-      should contain_wget__fetch('download lico script').with(
+      should contain_wget__fetch('download http://linuxcounter.net/script/old/lico-update-0.3.20.sh').with(
         'source'      => 'http://linuxcounter.net/script/old/lico-update-0.3.20.sh',
         'destination' => "/usr/local/linuxcounter/lico-update.sh"
       )
@@ -61,7 +61,8 @@ describe 'linuxcounter' do
       }
     end
     it {
-      should contain_wget__fetch('download lico script').with(
+      should contain_wget__fetch('download http://linuxcounter.net/script/old/lico-update-0.3.20.sh').with(
+        'source' => 'http://linuxcounter.net/script/old/lico-update-0.3.20.sh',
         'destination' => "/opt/linuxcounter/lico-update.sh"
       )
       should contain_file('lico_path').with(
@@ -84,8 +85,9 @@ describe 'linuxcounter' do
         'command' => "/opt/linuxcounter/lico-update.sh -m"
       )
 
-      should contain_user('tom').with(
+      should contain_user('lico_user').with(
         'ensure' => 'present',
+        'name'   => 'tom',
         'gid'    => 'tom'
       )
     }

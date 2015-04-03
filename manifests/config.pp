@@ -1,8 +1,9 @@
 class linuxcounter::config (
 $user = $::linuxcounter::params::user,
 $group = $::linuxcounter::params::group,
-$lico_config = $linuxcounter::params::lico_config
-) inherits ::linuxcounter::params {
+$lico_config = $linuxcounter::params::lico_config,
+$manage_cron = true
+) inherits linuxcounter::params {
   include linuxcounter::params
 
   file {'lico_config':
@@ -35,7 +36,7 @@ $lico_config = $linuxcounter::params::lico_config
     require => File['lico_config'],
   }
 
-  if $linuxcounter::manage_cron {
+  if $manage_cron {
     cron {'linuxcounter':
       ensure  => present,
       hour    => fqdn_rand(24),
